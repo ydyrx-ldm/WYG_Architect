@@ -2,33 +2,35 @@
 
 你的 AI 决策伙伴——随时记录一切，AI 自动分析、出方案、拆任务。
 
-## 架构
-
-```
-Flutter App (Android) ←→ FastAPI Backend ←→ WYG Agent Engine
-       ↕                        ↕
-Flutter Web (电脑端)      WebSocket 实时同步
-```
-
-## 后端启动
+## 快速开始
 
 ```bash
 cd backend
 pip install -r requirements.txt
-# 配置 .env
+
+# 配置 API Key
 cp .env.example .env
 # 编辑 .env 填入 DEEPSEEK_API_KEY
 
-# 启动
+# 启动（后端 + 前端一体）
 python -m app.main
-# 或
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+打开浏览器访问 **http://localhost:8000** 即可使用。
+
+## 架构
+
+```
+Web 前端 (HTML/CSS/JS)  ←→  FastAPI 后端  ←→  WYG Agent Engine
+        ↕                        ↕
+   浏览器直接访问            WebSocket 实时同步
 ```
 
 ## API 端点
 
 | 端点 | 方法 | 说明 |
 |------|------|------|
+| `/` | GET | 前端页面 |
 | `/api/records` | POST | 创建记录 |
 | `/api/records` | GET | 获取记录列表 |
 | `/api/wyg/explore` | POST | /WYG explore 阶段 |
@@ -37,6 +39,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 | `/api/wyg/solutions/{id}` | GET | 获取方案详情 |
 | `/ws/{user_id}` | WebSocket | 实时同步 |
 | `/health` | GET | 健康检查 |
+| `/docs` | GET | API 文档 |
 
 ## LLM 配置
 
@@ -50,8 +53,8 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ## 技术栈
 
+- **前端**: HTML + CSS + JavaScript（零依赖，浏览器直接打开）
 - **后端**: FastAPI + SQLAlchemy + SQLite
 - **AI**: WYG Agent Engine (7 Agent 流水线)
 - **LLM**: DeepSeek / 豆包 / Ollama（抽象层可切换）
 - **实时同步**: WebSocket
-- **前端**: Flutter (Android + Web)

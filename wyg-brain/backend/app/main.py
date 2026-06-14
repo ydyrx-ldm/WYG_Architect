@@ -1,12 +1,18 @@
 """WYG Brain - 外脑 App 后端入口"""
 
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.core.config import settings
 from app.models.database import init_db
 from app.api.routes import router
 from app.services.ws import manager
+
+# 前端静态文件路径
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'frontend')
 
 
 @asynccontextmanager
@@ -61,3 +67,12 @@ async def api_status():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+
+
+# 静态文件服务（前端）- 必须放在最后，避免覆盖 API 路由
+if os.path.isdir(FRONTEND_DIR):
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
+    @app.get("/")
+    async def serve_index():
+        return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))

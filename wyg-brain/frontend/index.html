@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>外脑 WYG Brain</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f0f1a">
+</head>
+<body>
+    <div id="app">
+        <!-- 侧边栏 -->
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h1>🧠 外脑</h1>
+                <button id="sidebar-close" class="icon-btn">✕</button>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-view="record">
+                    <span class="nav-icon">📝</span>
+                    <span>记录</span>
+                </button>
+                <button class="nav-btn" data-view="wyg">
+                    <span class="nav-icon">🎯</span>
+                    <span>/WYG</span>
+                </button>
+                <button class="nav-btn" data-view="solutions">
+                    <span class="nav-icon">💡</span>
+                    <span>方案</span>
+                </button>
+                <button class="nav-btn" data-view="timeline">
+                    <span class="nav-icon">📅</span>
+                    <span>时间线</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="connection-status" id="ws-status">
+                    <span class="status-dot offline"></span>
+                    <span>未连接</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main id="main-content">
+            <!-- 顶栏 -->
+            <header class="topbar">
+                <button id="sidebar-toggle" class="icon-btn">☰</button>
+                <h2 id="page-title">记录</h2>
+                <div class="topbar-actions">
+                    <button id="api-key-btn" class="icon-btn" title="设置 API">⚙️</button>
+                </div>
+            </header>
+
+            <!-- 记录视图 -->
+            <section id="view-record" class="view active">
+                <div class="record-input-area">
+                    <textarea id="record-input" placeholder="记录你的想法、需求、灵感..." rows="3"></textarea>
+                    <div class="record-input-actions">
+                        <div class="mood-selector">
+                            <button class="mood-btn" data-mood="happy" title="开心">😊</button>
+                            <button class="mood-btn" data-mood="thinking" title="思考">🤔</button>
+                            <button class="mood-btn" data-mood="idea" title="灵感">💡</button>
+                            <button class="mood-btn" data-mood="worry" title="担忧">😟</button>
+                            <button class="mood-btn" data-mood="angry" title="生气">😤</button>
+                        </div>
+                        <div class="tag-input-wrapper">
+                            <input type="text" id="tag-input" placeholder="标签（逗号分隔）" />
+                        </div>
+                        <button id="record-submit" class="primary-btn">记录</button>
+                    </div>
+                </div>
+                <div id="record-list" class="record-list">
+                    <div class="empty-state">
+                        <p>📝 还没有记录，开始记录你的想法吧</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- /WYG 视图 -->
+            <section id="view-wyg" class="view">
+                <div class="wyg-start" id="wyg-start">
+                    <div class="wyg-hero">
+                        <h2>🎯 /WYG</h2>
+                        <p>输入你的需求，7 个 Agent 协作完成</p>
+                    </div>
+                    <div class="wyg-pipeline-info">
+                        <div class="pipeline-step">
+                            <span class="step-badge">1</span>
+                            <span class="step-label">explore</span>
+                            <span class="step-agent">BA★ + SA</span>
+                        </div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-step">
+                            <span class="step-badge">2</span>
+                            <span class="step-label">propose</span>
+                            <span class="step-agent">SA★ + PM + RR</span>
+                        </div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-step">
+                            <span class="step-badge">3</span>
+                            <span class="step-label">apply</span>
+                            <span class="step-agent">DEV★ + CR + TE</span>
+                        </div>
+                        <div class="pipeline-arrow">→</div>
+                        <div class="pipeline-step">
+                            <span class="step-badge">4</span>
+                            <span class="step-label">archive</span>
+                            <span class="step-agent">PM★</span>
+                        </div>
+                    </div>
+                    <div class="wyg-input-area">
+                        <textarea id="wyg-input" placeholder="描述你的需求...&#10;例如：系统太慢了&#10;例如：帮我设计一个埋点系统" rows="4"></textarea>
+                        <button id="wyg-submit" class="primary-btn large">🚀 启动 /WYG</button>
+                    </div>
+                </div>
+                <div class="wyg-chat" id="wyg-chat" style="display:none">
+                    <div class="chat-messages" id="chat-messages"></div>
+                    <div class="chat-input-area">
+                        <textarea id="chat-input" placeholder="回复 BA..." rows="2"></textarea>
+                        <button id="chat-send" class="primary-btn">发送</button>
+                        <button id="chat-confirm" class="accent-btn" style="display:none">✅ 确认，进入 propose</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 方案视图 -->
+            <section id="view-solutions" class="view">
+                <div id="solution-list" class="solution-list">
+                    <div class="empty-state">
+                        <p>💡 还没有方案，通过 /WYG 生成</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 时间线视图 -->
+            <section id="view-timeline" class="view">
+                <div id="timeline-list" class="timeline-list">
+                    <div class="empty-state">
+                        <p>📅 时间线为空</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- API 设置弹窗 -->
+    <div id="api-modal" class="modal" style="display:none">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙️ 设置</h3>
+                <button class="icon-btn modal-close">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>后端地址</label>
+                    <input type="text" id="setting-api-url" value="http://localhost:8000" />
+                </div>
+                <div class="form-group">
+                    <label>DeepSeek API Key</label>
+                    <input type="password" id="setting-deepseek-key" placeholder="sk-..." />
+                </div>
+                <p class="form-hint">API Key 仅存储在浏览器本地，不会上传到任何服务器</p>
+            </div>
+            <div class="modal-footer">
+                <button id="settings-save" class="primary-btn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 方案详情弹窗 -->
+    <div id="solution-modal" class="modal" style="display:none">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="solution-modal-title">方案详情</h3>
+                <button class="icon-btn modal-close">✕</button>
+            </div>
+            <div class="modal-body" id="solution-modal-body">
+            </div>
+            <div class="modal-footer">
+                <button id="solution-propose-btn" class="accent-btn" style="display:none">进入 propose 阶段</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
