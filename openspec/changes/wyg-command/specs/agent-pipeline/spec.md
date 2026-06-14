@@ -1,7 +1,7 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Agent pipeline execution order
-The system SHALL execute Agents based on the current opsx phase, with dynamic team formation: explore(BA★+SA), propose(SA★+PM+RR), apply(DEV★+CR+TE), archive(PM★). The `/WYG` command SHALL be the unified entry point that triggers the full pipeline. Phases SHALL execute in strict serial order: explore → propose → apply → archive. Gates (RR, CR, TE) SHALL NOT be bypassed. The `/WYG` command is an independent command that coexists with existing `/opsx:*` commands.
+The system SHALL execute Agents based on the current opsx phase, with dynamic team formation: explore(BA★+SA), propose(SA★+PM+RR), apply(DEV★+CR+TE), archive(PM★). The `/WYG` command SHALL be the unified entry point that triggers the pipeline. Phases SHALL execute in strict serial order: explore → propose → apply → archive. Gates (RR, CR, TE) SHALL NOT be bypassed.
 
 #### Scenario: /WYG triggers explore phase
 - **WHEN** user inputs `/WYG` with an explore-intent requirement
@@ -26,10 +26,6 @@ The system SHALL execute Agents based on the current opsx phase, with dynamic te
 #### Scenario: Pipeline completion
 - **WHEN** TE completes execution and passes all tests
 - **THEN** WYG Architect SHALL collect all Agent outputs and return the consolidated result to the user, then proceed to archive phase
-
-#### Scenario: /WYG coexists with opsx commands
-- **WHEN** user uses `/opsx:*` commands individually
-- **THEN** the opsx commands SHALL work as before for manual single-phase operations
 
 ### Requirement: Pipeline rollback on test failure
 The system SHALL support rollback when TE, CR, or any Agent identifies a failure. The discovering Agent SHALL determine which stage to roll back to based on the nature of the failure. The rollback target Agent SHALL receive the error memory as context to avoid repeating the same mistake. The `/WYG` command SHALL support re-entering the pipeline at the rollback point.
@@ -62,7 +58,7 @@ The system SHALL record error memory for every rollback event. Error memory SHAL
 - **THEN** DEV SHALL read relevant error memories to avoid repeating the same mistakes
 
 ### Requirement: WYG Architect god view
-The system SHALL provide a WYG Architect god view layer that receives user requests via the `/WYG` command, identifies intent, prints pipeline orchestration, routes to the correct phase, dispatches to corresponding Agents, and collects outputs to return to the user. The `/WYG` command is an independent command that coexists with existing `/opsx:*` commands.
+The system SHALL provide a WYG Architect god view layer that receives user requests via the `/WYG` command, identifies intent, prints pipeline orchestration, routes to the correct phase, dispatches to corresponding Agents, and collects outputs to return to the user.
 
 #### Scenario: Request dispatch and collection via /WYG
 - **WHEN** user submits a request via `/WYG`
