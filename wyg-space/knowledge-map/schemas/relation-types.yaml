@@ -1,0 +1,43 @@
+# 关联类型枚举
+# 知识地图支持的关联关系类型
+
+relation_types:
+  - name: part_of
+    description: "部分-整体关系：A是B的一部分"
+    example: "三叠泉 part_of 庐山"
+
+  - name: depends_on
+    description: "依赖关系：A依赖B才能存在/工作"
+    example: "AI分析 depends_on 日志数据"
+
+  - name: affects
+    description: "影响关系：A会影响B"
+    example: "梅雨季 affects 行程规划"
+
+  - name: refines
+    description: "细化关系：A是对B的更详细描述"
+    example: "三叠泉游览路线 refines 三叠泉"
+
+  - name: contradicts
+    description: "矛盾关系：A与B矛盾"
+    example: "快速响应 contradicts 全面分析"
+
+  - name: exemplifies
+    description: "举例关系：A是B的实例"
+    example: "庐山行程 exemplifies 旅游攻略模式"
+
+  - name: generalizes
+    description: "泛化关系：A是B的泛化/抽象"
+    example: "行程规划 generalizes 庐山行程"
+
+  - name: conflicts_with
+    description: "冲突关系：A与B不可同时存在/执行"
+    example: "三叠泉 conflicts_with 五老峰同日下午"
+
+  - name: requires
+    description: "需求关系：A需要B作为前提"
+    example: "三叠泉 requires 体力消耗"
+
+  - name: sequence
+    description: "时序关系：A在B之前/之后"
+    example: "下载日志 sequence 解压文件"

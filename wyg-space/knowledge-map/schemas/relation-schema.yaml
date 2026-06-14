@@ -1,0 +1,14 @@
+# 关联关系 YAML Schema
+# 存储位置: wyg-space/knowledge-map/relations/{from}-{relation_type}-{to}.yaml
+
+from:
+  id: ""         # 源节点ID
+  type: ""       # 源节点类型
+to:
+  id: ""         # 目标节点ID
+  type: ""       # 目标节点类型
+relation: ""     # 关联类型 (见 relation-types.yaml)
+confidence: 1.0  # AI推断置信度 (0.0-1.0)
+source: ""       # 来源: 哪个Agent/输出创建了此关联
+created_at: ""   # 创建时间 (ISO 8601)
+context: ""      # 关联上下文说明

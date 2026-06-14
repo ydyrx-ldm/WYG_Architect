@@ -1,0 +1,8 @@
+# 知识节点 YAML Schema
+# 存储位置: wyg-space/knowledge-map/nodes/{node-id}.yaml
+
+id: ""           # 节点唯一标识，如"三叠泉"、"ANR分析"
+type: ""         # 节点类型，如 scenic-spot, technology, concept, pattern
+description: ""  # 节点描述
+created_at: ""   # 创建时间 (ISO 8601)
+updated_at: ""   # 更新时间 (ISO 8601)
