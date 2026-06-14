@@ -1,6 +1,48 @@
 # PM 案例 - 项目管理案例库
 
-## 案例1: 旅游攻略项目
+## 案例1: /opsx:propose — 用户行为分析（PM 辅助拆任务）
+
+**SA 方案设计**: ClickHouse + SDK自研 + Kafka/Flink + Grafana
+
+**PM 辅助 — 拆解任务**:
+
+### 1. SDK 开发
+- [ ] 1.1 Web端埋点SDK开发
+- [ ] 1.2 App端埋点SDK开发
+- [ ] 1.3 SDK集成测试
+
+### 2. 数据管道
+- [ ] 2.1 Kafka集群部署
+- [ ] 2.2 Flink作业开发
+- [ ] 2.3 数据管道联调
+
+### 3. 存储层
+- [ ] 3.1 ClickHouse集群部署
+- [ ] 3.2 建表与索引设计
+
+### 4. 报表层
+- [ ] 4.1 Grafana Dashboard开发
+- [ ] 4.2 运营自助查询接口
+
+### 5. 数据迁移
+- [ ] 5.1 历史数据迁移脚本
+- [ ] 5.2 数据校验
+
+**风险识别**:
+- 历史数据格式不统一，迁移可能延期
+- Web+App双端SDK维护成本
+- ClickHouse运维经验不足
+
+## 案例2: /opsx:archive — 归档操作
+
+**PM ★ 主导**:
+1. 移动变更目录到 `openspec/changes/archive/2026-06-14-user-behavior-analysis/`
+2. 同步 delta specs 到 `openspec/specs/`
+3. `git add -A && git commit -m "archive: user-behavior-analysis"`
+4. `git push origin main`
+5. 确认 GitHub 同步成功
+
+## 案例3: 旅游攻略项目
 
 **用户输入**: "制作6月18日三天两夜的九江、南昌旅游攻略"
 

@@ -1,6 +1,40 @@
 # DEV 案例 - 开发实现案例库
 
-## 案例1: 旅游攻略内容制作
+## 案例1: /opsx:apply — 用户行为分析系统（DEV ★ 主导）
+
+**tasks.md 任务列表**:
+1. SDK 开发（Web端埋点 + App端埋点）
+2. 数据管道搭建（Kafka + Flink）
+3. 存储层部署（ClickHouse 集群）
+4. 报表层开发（Grafana Dashboard）
+5. 历史数据迁移
+
+**DEV 逐项实现**:
+- Task 1.1: Web端埋点SDK → 完成
+- Task 1.2: App端埋点SDK → 完成
+- Task 2.1: Kafka集群部署 → 完成
+- Task 2.2: Flink作业开发 → 完成
+- Task 3.1: ClickHouse建表 → 完成
+- Task 4.1: Grafana Dashboard → 完成
+- Task 5.1: 历史数据迁移脚本 → 完成
+
+**CR 门禁评审**（DEV 全部完成后一次性评审）:
+- [必须修改] SDK 缺少断线重连逻辑
+- [必须修改] Kafka topic 分区数与消费者数不匹配
+- [建议修改] 日志格式可以统一
+- [认可] ClickHouse 建表语句规范
+→ 驳回，回退 DEV
+
+**DEV 修复后 CR 再次评审** → 通过
+
+**TE 验收**（CR 通过后执行）:
+- 模拟用户操作 → 埋点数据正确上报 ✓
+- Kafka → Flink → ClickHouse 数据链路通畅 ✓
+- Grafana 报表数据准确 ✓
+- 历史数据迁移完整 ✓
+→ 全部通过，apply 阶段完成
+
+## 案例2: 旅游攻略内容制作
 
 **RR 通过的方案**: 三天两夜九江南昌行程
 
