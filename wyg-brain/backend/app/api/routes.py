@@ -686,202 +686,29 @@ _CATEGORY_RELATIONS = {
 }
 
 
-# 字义关联表：单字间的语义关联度（0-100）
-# 用于处理词林无法覆盖的跨大类关联（如 爬↔攀, 山↔岩）
-_CHAR_RELATIONS = {
-    # 攀爬类
-    ("爬", "攀"): 55, ("攀", "爬"): 55,
-    ("爬", "登"): 50, ("登", "爬"): 50,
-    ("攀", "登"): 55, ("登", "攀"): 55,
-    ("跑", "爬"): 35, ("爬", "跑"): 35,
-    ("走", "跑"): 40, ("跑", "走"): 40,
-    ("行", "走"): 40, ("走", "行"): 40,
-    # 山岳类
-    ("山", "岩"): 45, ("岩", "山"): 45,
-    ("山", "峰"): 50, ("峰", "山"): 50,
-    ("山", "岭"): 45, ("岭", "山"): 45,
-    ("山", "崖"): 45, ("崖", "山"): 45,
-    ("岩", "崖"): 40, ("崖", "岩"): 40,
-    # 水类
-    ("水", "海"): 45, ("海", "水"): 45,
-    ("水", "河"): 45, ("河", "水"): 45,
-    ("水", "湖"): 45, ("湖", "水"): 45,
-    ("水", "江"): 45, ("江", "水"): 45,
-    # 动物类
-    ("虎", "狮"): 40, ("狮", "虎"): 40,
-    ("鱼", "鲨"): 45, ("鲨", "鱼"): 45,
-    ("鸟", "鹰"): 40, ("鹰", "鸟"): 40,
-    # 颜色类
-    ("红", "赤"): 50, ("赤", "红"): 50,
-    ("黑", "暗"): 40, ("暗", "黑"): 40,
-    ("白", "亮"): 40, ("亮", "白"): 40,
-    # 运动类
-    ("球", "篮"): 35, ("篮", "球"): 35,
-    ("球", "足"): 35, ("足", "球"): 35,
-    ("球", "网"): 35, ("网", "球"): 35,
-    # 交通类
-    ("车", "汽"): 40, ("汽", "车"): 40,
-    ("车", "船"): 30, ("船", "车"): 30,
-    ("飞", "机"): 35, ("机", "飞"): 35,
-    # 食物类
-    ("果", "果"): 100,
-    ("茶", "饮"): 40, ("饮", "茶"): 40,
-    # 时间类
-    ("春", "夏"): 35, ("夏", "春"): 35,
-    ("秋", "冬"): 35, ("冬", "秋"): 35,
-    # 情感类
-    ("爱", "情"): 45, ("情", "爱"): 45,
-    ("喜", "乐"): 45, ("乐", "喜"): 45,
-}
+# 三维语义向量表（独立模块）
+from app.api.semantic_vectors import get_svt as _get_svt
+
+# 初始化向量表并注入词库映射
+_svt = _get_svt()
+_svt.set_word_categories(_WORD_TO_CATEGORY)
 
 
 def _calc_similarity(target: str, guess: str) -> int:
-    """即时计算两词的语义相似度（0-100），无网络调用，<1ms
-    
-    综合策略：
-    1. 完全相同 → 100
-    2. 词林近义 → 85-95
-    3. 词林相关 → 60-75
-    4. 字符重叠/包含 → 35-85
-    5. 同类别 → 65
-    6. 跨类别关联 → 按关联表
-    7. 首尾字相同 → 35-40
+    """即时计算两词的语义相似度（0-100），三维向量表，<1ms
+
+    三维综合：
+    1. 关联表（名人→领域、品牌→产品）→ 80-95
+    2. 类别向量 + 属性向量 → 8-100
+    3. 词林近义链 + 字义关联 + 基础分 → 5-92
     """
-    if guess == target:
-        return 100
-
-    score = 0
-
-    # 2. 词林近义/相关判断
     cilin = _get_cilin()
-    if cilin:
-        try:
-            if cilin.is_similar(target, guess):
-                # 词林判定为近义，进一步细分
-                target_syns = set(cilin.get_synonyms(target))
-                if guess in target_syns:
-                    score = max(score, 92)  # 直接近义
-                else:
-                    score = max(score, 78)  # 相关（共享编码/前缀/子串）
-        except Exception:
-            pass
-
-    # 3. 包含关系
-    if guess in target or target in guess:
-        score = max(score, 85)
-
-    # 4. 字符重叠（共享汉字）
-    target_chars = set(target)
-    guess_chars = set(guess)
-    common = target_chars & guess_chars
-    if common:
-        overlap = len(common) / max(len(target_chars), len(guess_chars))
-        score = max(score, int(overlap * 75))
-
-    # 5. 同类别（含词林推断）
-    t_cat = _WORD_TO_CATEGORY.get(target)
-    g_cat = _WORD_TO_CATEGORY.get(guess)
-
-    # 如果猜测词不在词库，通过词林推断类别（一级+二级）
-    if not g_cat and cilin:
-        try:
-            # 一级：近义词直接在词库中
-            syns = cilin.get_synonyms(guess)
-            for syn in syns:
-                inferred = _WORD_TO_CATEGORY.get(syn)
-                if inferred:
-                    g_cat = inferred
-                    break
-            # 二级：近义词的近义词在词库中
-            if not g_cat:
-                for syn in syns:
-                    syns2 = cilin.get_synonyms(syn)
-                    for syn2 in syns2:
-                        inferred = _WORD_TO_CATEGORY.get(syn2)
-                        if inferred:
-                            g_cat = inferred
-                            break
-                    if g_cat:
-                        break
-            # 三级：检查猜测词与所有类别代表词的 is_similar
-            if not g_cat:
-                for cat, cat_words in _WORD_CATEGORIES.items():
-                    for cw in cat_words:
-                        if cilin.is_similar(guess, cw):
-                            g_cat = cat
-                            break
-                    if g_cat:
-                        break
-        except Exception:
-            pass
-
-    # 如果目标词不在词库（理论上不会，但防御性处理）
-    if not t_cat and cilin:
-        try:
-            syns = cilin.get_synonyms(target)
-            for syn in syns:
-                inferred = _WORD_TO_CATEGORY.get(syn)
-                if inferred:
-                    t_cat = inferred
-                    break
-        except Exception:
-            pass
-
-    if t_cat and g_cat:
-        if t_cat == g_cat:
-            score = max(score, 65)
-        else:
-            rel = _CATEGORY_RELATIONS.get((t_cat, g_cat), 0)
-            if rel > 0:
-                score = max(score, rel)
-
-    # 6. 首字相同
-    if target[0] == guess[0] and len(target) > 1 and len(guess) > 1:
-        score = max(score, 40)
-
-    # 7. 尾字相同
-    if target[-1] == guess[-1] and len(target) > 1 and len(guess) > 1:
-        score = max(score, 35)
-
-    # 8. 词林近义链推断（处理不在词库的猜测词）
-    #    如果猜测词的近义词与目标词的近义词有交集，说明语义相近
-    if score < 30 and cilin:
-        try:
-            t_syns = set(cilin.get_synonyms(target))
-            g_syns = set(cilin.get_synonyms(guess))
-            # 近义词有交集
-            if t_syns & g_syns:
-                score = max(score, 55)
-            # 二级近义：猜测词近义词的近义词 与 目标词近义词有交集
-            elif t_syns:
-                for gs in g_syns:
-                    gs2 = set(cilin.get_synonyms(gs))
-                    if t_syns & gs2:
-                        score = max(score, 45)
-                        break
-        except Exception:
-            pass
-
-    # 9. 字义关联：单字间的语义关联（如 爬↔攀, 山↔岩/峰/岭）
-    if score < 30:
-        for tc in target:
-            for gc in guess:
-                rel = _CHAR_RELATIONS.get((tc, gc), 0)
-                if rel > 0:
-                    score = max(score, rel)
-                    break
-            if score >= 30:
-                break
-
-    # 10. 基础分：任何两个中文词都有微弱关联（至少5分）
-    #    确保用户不会看到全0，有反馈感
-    if score == 0:
-        # 词长接近度（长度差越小，基础分越高）
-        len_diff = abs(len(target) - len(guess))
-        base = max(5, 12 - len_diff * 3)
-        score = max(score, base)
-
-    return min(100, score)
+    return _svt.similarity(
+        target, guess,
+        word_categories=_WORD_TO_CATEGORY,
+        word_pool=_WORD_POOL,
+        cilin=cilin,
+    )
 
 
 class GameStartResponse(BaseModel):
