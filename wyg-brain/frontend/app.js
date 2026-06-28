@@ -71,6 +71,9 @@ const api = {
     async gameGuess(gameId, guess) {
         return this.request('POST', '/api/game/guess', { game_id: gameId, guess });
     },
+    async gamePreview(gameId, guess) {
+        return this.request('POST', '/api/game/preview', { game_id: gameId, guess });
+    },
     async gameGiveup(gameId) {
         return this.request('POST', '/api/game/giveup', { game_id: gameId, guess: '' });
     },
@@ -995,8 +998,9 @@ async function submitGuess() {
     if (!guess || !state.gameId) return;
 
     input.value = '';
+    // 清除预览
+    document.getElementById('game-preview').innerHTML = '';
     const resultDiv = document.getElementById('game-result');
-    resultDiv.innerHTML = '<div class="game-thinking">正在计算语义相关度...</div>';
 
     try {
         const result = await api.gameGuess(state.gameId, guess);
@@ -1009,6 +1013,10 @@ async function submitGuess() {
             // 显示概率
             const prob = result.probability;
             const probColor = prob >= 80 ? 'var(--success)' : prob >= 60 ? 'var(--warning)' : prob >= 30 ? 'var(--accent)' : 'var(--danger)';
+            let bonusHtml = '';
+            if (result.bonus_hint) {
+                bonusHtml = `<div class="game-bonus-hint">${escapeHtml(result.bonus_hint)}</div>`;
+            }
             resultDiv.innerHTML = `
                 <div class="game-prob-display">
                     <div class="game-prob-label">「${escapeHtml(guess)}」的语义相关度</div>
@@ -1017,6 +1025,7 @@ async function submitGuess() {
                     </div>
                     <div class="game-prob-number" style="color:${probColor}">${prob}%</div>
                     <div class="game-prob-hint">${escapeHtml(result.hint)}</div>
+                    ${bonusHtml}
                 </div>
             `;
         }
@@ -1026,6 +1035,42 @@ async function submitGuess() {
     } catch (err) {
         resultDiv.innerHTML = '<div class="game-error">猜测失败: ' + escapeHtml(err.message) + '</div>';
     }
+}
+
+// 实时预览防抖
+let _previewTimer = null;
+
+async function previewGuess() {
+    const input = document.getElementById('game-input');
+    const guess = input.value.trim();
+    const previewDiv = document.getElementById('game-preview');
+
+    if (!guess || !state.gameId) {
+        previewDiv.innerHTML = '';
+        return;
+    }
+
+    // 防抖：输入后 150ms 才请求
+    if (_previewTimer) clearTimeout(_previewTimer);
+    _previewTimer = setTimeout(async () => {
+        try {
+            const result = await api.gamePreview(state.gameId, guess);
+            const prob = result.probability;
+            if (prob > 0 && guess === input.value.trim()) {
+                const color = prob >= 80 ? 'var(--success)' : prob >= 60 ? 'var(--warning)' : prob >= 30 ? 'var(--accent)' : 'var(--danger)';
+                previewDiv.innerHTML = `
+                    <div class="game-preview-bar">
+                        <div class="game-preview-bar-fill" style="width:${prob}%; background:${color}"></div>
+                    </div>
+                    <span class="game-preview-text" style="color:${color}">${prob}%</span>
+                `;
+            } else {
+                previewDiv.innerHTML = '';
+            }
+        } catch (err) {
+            previewDiv.innerHTML = '';
+        }
+    }, 150);
 }
 
 function renderGameHistory(history) {
@@ -1169,6 +1214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('game-input').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') submitGuess();
     });
+    document.getElementById('game-input').addEventListener('input', previewGuess);
 
     // 点击遮罩关闭弹窗
     document.querySelectorAll('.modal').forEach(modal => {
