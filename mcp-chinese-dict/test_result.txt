@@ -1,0 +1,33 @@
+============================================================
+Chinese Synonym/Antonym Dictionary MCP - Unit Tests
+============================================================
+[PASS] loader basic: 77464 words, 22032 codes
+[PASS] synonyms of 'ren': ['成年人', '壮年人', '大人', '丁', '壮丁']...
+[PASS] non-existent word returns empty
+[PASS] antonyms of 'da': ['小']
+[PASS] antonyms of 'kuai': ['慢']
+[PASS] identical words -> similar
+[PASS] containment -> similar
+[PASS] cilin synonym: 'ren' ~ '成年人'
+[PASS] not similar: 'ziranfengguang' !~ 'lishiwenhua'
+[PASS] not similar: 'meishitiyan' !~ 'lishiwenhua'
+[PASS] dedup: ['自然风光', '自然景观', '山水游览', '历史文化', '美食体验'] -> ['自然风光', '山水游览', '历史文化', '美食体验']
+[PASS] no dedup needed: ['自然风光', '历史文化', '美食体验']
+[PASS] empty list -> empty list
+[PASS] BA scenario 1: ['自然风光', '自然景观', '山水游览', '历史文化', '美食体验'] -> ['自然风光', '山水游览', '历史文化', '美食体验'] (expect<=4, got=4)
+[PASS] BA scenario 2: ['休闲放松', '休闲度假', '休闲购物', '深度游览', '文化体验'] -> ['休闲放松', '深度游览', '文化体验'] (expect<=3, got=3)
+[PASS] BA scenario 3: ['自然风光', '历史文化', '美食体验'] -> ['自然风光', '历史文化', '美食体验'] (expect<=3, got=3)
+[PASS] BA scenario 4: ['经济型', '舒适型', '豪华型'] -> ['经济型', '舒适型', '豪华型'] (expect<=3, got=3)
+
+============================================================
+MCP Tool Interface Tests
+============================================================
+[PASS] MCP get_synonyms('ren'): count=35
+[PASS] MCP get_antonyms('da'): ['小']
+[PASS] MCP is_similar('ziranfengguang','ziranjingguan'): True (词林近义关系)
+[PASS] MCP is_similar('ziranfengguang','lishiwenhua'): False (无近义关系)
+[PASS] MCP deduplicate: ['自然风光', '自然景观', '历史文化'] -> ['自然风光', '历史文化'], removed: ['自然景观']
+
+============================================================
+[ALL PASS] All tests passed!
+============================================================

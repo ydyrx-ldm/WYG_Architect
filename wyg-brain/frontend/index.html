@@ -34,6 +34,10 @@
                     <span class="nav-icon">📅</span>
                     <span>时间线</span>
                 </button>
+                <button class="nav-btn" data-view="game">
+                    <span class="nav-icon">🎮</span>
+                    <span>猜词游戏</span>
+                </button>
             </nav>
             <div class="sidebar-footer">
                 <div class="connection-status" id="ws-status">
@@ -119,9 +123,9 @@
                 <div class="wyg-chat" id="wyg-chat" style="display:none">
                     <div class="chat-messages" id="chat-messages"></div>
                     <div class="chat-input-area">
-                        <textarea id="chat-input" placeholder="回复 BA..." rows="2"></textarea>
+                        <textarea id="chat-input" placeholder="输入你的想法..." rows="2"></textarea>
                         <button id="chat-send" class="primary-btn">发送</button>
-                        <button id="chat-confirm" class="accent-btn" style="display:none">✅ 确认，进入 propose</button>
+                        <button id="chat-confirm" class="accent-btn" style="display:none">✅ 直接生成方案</button>
                     </div>
                 </div>
             </section>
@@ -140,6 +144,41 @@
                 <div id="timeline-list" class="timeline-list">
                     <div class="empty-state">
                         <p>📅 时间线为空</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 猜词游戏视图 -->
+            <section id="view-game" class="view">
+                <div class="game-container">
+                    <!-- 开始界面 -->
+                    <div class="game-start-screen" id="game-start-screen">
+                        <div class="game-hero">
+                            <h2>🎮 猜词游戏</h2>
+                            <p>系统随机选一个词，你来猜！每次猜测会显示语义相关度</p>
+                        </div>
+                        <button class="primary-btn large" id="game-start-btn">开始游戏</button>
+                    </div>
+                    <!-- 游戏界面 -->
+                    <div class="game-play-screen" id="game-play-screen" style="display:none">
+                        <div class="game-header">
+                            <div class="game-hint" id="game-hint"></div>
+                            <button class="game-giveup-btn" id="game-giveup-btn">放弃</button>
+                        </div>
+                        <div class="game-input-area">
+                            <input type="text" id="game-input" placeholder="输入你猜的词..." autocomplete="off" />
+                            <button class="primary-btn" id="game-guess-btn">猜！</button>
+                        </div>
+                        <div class="game-result" id="game-result"></div>
+                        <div class="game-history" id="game-history">
+                            <div class="game-history-title">猜测历史（按相关度排序）</div>
+                            <div class="game-history-list" id="game-history-list"></div>
+                        </div>
+                    </div>
+                    <!-- 结束界面 -->
+                    <div class="game-end-screen" id="game-end-screen" style="display:none">
+                        <div class="game-end-result" id="game-end-result"></div>
+                        <button class="primary-btn large" id="game-restart-btn">再来一局</button>
                     </div>
                 </div>
             </section>

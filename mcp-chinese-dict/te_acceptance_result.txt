@@ -1,0 +1,71 @@
+============================================================
+TE Acceptance Tests - Chinese Dict MCP
+============================================================
+
+--- Acceptance 1: get_synonyms ---
+1.1 get_synonyms('ren'): count=35, sample=['人格', '人品', '人头']
+[PASS] 1.1
+1.2 get_synonyms('diannao'): ['计算机', '微处理机', '微电脑', '微机', '微型机']
+[PASS] 1.2
+1.3 get_synonyms(non-existent): count=0
+[PASS] 1.3
+
+--- Acceptance 2: get_antonyms ---
+2.1 get_antonyms('da'): ['小']
+[PASS] 2.1
+2.2 get_antonyms('kuai'): ['慢']
+[PASS] 2.2
+
+--- Acceptance 3: is_similar ---
+3.1 is_similar('ziranfengguang','ziranjingguan'): True (词林近义关系)
+[PASS] 3.1
+3.2 is_similar('ziranfengguang','lishiwenhua'): False (无近义关系)
+[PASS] 3.2
+3.3 is_similar('xiuxianfangsong','xiuxiandujia'): True (词林近义关系)
+[PASS] 3.3
+3.4 is_similar('jingjixing','shushixing'): False (无近义关系)
+[PASS] 3.4
+
+--- Acceptance 4: deduplicate_options ---
+4.1 dedup: ['自然风光', '自然景观', '历史文化'] -> ['自然风光', '历史文化'], removed: ['自然景观']
+[PASS] 4.1
+4.2 dedup (no dup): ['自然风光', '历史文化', '美食体验'] -> ['自然风光', '历史文化', '美食体验']
+[PASS] 4.2
+4.3 dedup (xiuxian): ['休闲放松', '休闲度假', '休闲购物', '深度游览', '文化体验'] -> ['休闲放松', '深度游览', '文化体验']
+[PASS] 4.3
+
+--- Acceptance 5: Performance ---
+5.1 avg deduplicate latency: 0.08ms
+[PASS] 5.1 latency < 10ms
+5.2 avg is_similar latency: 0.001ms
+[PASS] 5.2 latency < 10ms
+
+--- Acceptance 6: Regression ---
+  [PASS] ['自然风光', '自然景观'] -> ['自然风光'] (expect dedup=True, got=True)
+  [PASS] ['历史文化', '人文古迹'] -> ['历史文化', '人文古迹'] (expect dedup=False, got=False)
+  [PASS] ['休闲放松', '休闲度假'] -> ['休闲放松'] (expect dedup=True, got=True)
+  [PASS] ['自驾', '自驾游'] -> ['自驾'] (expect dedup=True, got=True)
+  [PASS] ['跟团游', '团队游'] -> ['跟团游'] (expect dedup=True, got=True)
+  [PASS] ['自由行', '自助游'] -> ['自由行', '自助游'] (expect dedup=False, got=False)
+  [PASS] ['海边', '海滨'] -> ['海边', '海滨'] (expect dedup=False, got=False)
+  [PASS] ['深度游', '慢游'] -> ['深度游', '慢游'] (expect dedup=False, got=False)
+
+--- Acceptance 7: engine.py Integration ---
+7.1 CILIN_AVAILABLE: True
+[PASS] 7.1
+7.2 BA output normalized:
+问题1：你想去什么类型的景点？
+A) 自然风光
+B) 历史文化
+C) 看情况
+
+问题2：你的预算范围？
+A) 经济型
+B) 舒适型
+C) 豪华型
+[PASS] 7.2 'ziranjingguan' deduplicated with 'ziranfengguang'
+[PASS] 7.3 non-similar options preserved
+
+============================================================
+[ALL PASS] All acceptance tests passed!
+============================================================

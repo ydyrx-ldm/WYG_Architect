@@ -1,8 +1,14 @@
 """WYG Brain - 外脑 App 后端配置"""
 
+import os
+from pathlib import Path
 from pydantic_settings import BaseSettings
 from typing import Optional
 from enum import Enum
+
+# .env 文件路径：始终从 backend 目录查找
+BACKEND_DIR = Path(__file__).parent.parent.parent
+ENV_FILE = BACKEND_DIR / ".env"
 
 
 class LLMProvider(str, Enum):
@@ -43,7 +49,7 @@ class Settings(BaseSettings):
     # Storage
     MEDIA_DIR: str = "./media"
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {"env_file": str(ENV_FILE), "env_file_encoding": "utf-8"}
 
 
 settings = Settings()

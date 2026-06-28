@@ -1,0 +1,19 @@
+[project]
+name = "mcp-chinese-dict"
+version = "0.1.0"
+description = "中文近义反义词典 MCP 服务，基于同义词词林扩展版"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+]
+
+[project.scripts]
+mcp-chinese-dict = "server:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[tool.setuptools]
+py-modules = ["server"]
+packages = ["loaders", "tools"]
